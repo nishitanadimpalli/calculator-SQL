@@ -1,55 +1,32 @@
-name: Docker Compose CI
+# .github/docker-compose.ci.yml
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: calcdb
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d calcdb || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
 
-on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+  api:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URL: postgresql+psycopg://postgres:postgres@db:5432/calcdb
+    depends_on:
+      db:
+        condition: service_healthy
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    services:
-      postgres:
-        image: postgres:16
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: calcpass
-          POSTGRES_DB: calcdb
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd="pg_isready -U postgres"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=5
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
-      - name: Install dependencies
-        run: |
-          cd app
-          pip install -r requirements.txt
-
-      - name: Run syntax check
-        run: |
-          cd app
-          python -m compileall .
-
-      - name: Validate docker-compose build
-        run: |
-          docker compose -f docker-compose.yml config
-          docker compose -f docker-compose.yml build
-
-      - name: Check running containers
-        run: |
-          docker compose -f docker-compose.yml up -d
-          docker ps -a
+  pgadmin:
+    image: dpage/pgadmin4:8.13
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    depends_on:
+      db:
+        condition: service_healthy
