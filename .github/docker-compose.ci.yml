@@ -1,3 +1,4 @@
+# .github/docker-compose.ci.yml
 services:
   db:
     image: postgres:16
@@ -13,7 +14,7 @@ services:
 
   api:
     build:
-      context: ./app
+      context: ../app     # ✅ FIX: go up one level
       dockerfile: Dockerfile
     environment:
       DATABASE_URL: postgresql+psycopg://postgres:postgres@db:5432/calcdb
