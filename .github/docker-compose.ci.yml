@@ -1,0 +1,11 @@
+version: "3.9"
+
+services:
+  api:
+    ports: []   # disable host port mapping in CI
+
+  db:
+    ports: []   # disable host port mapping in CI
+
+  pgadmin:
+    profiles: ["ci-off"]  # skip pgAdmin in CI
