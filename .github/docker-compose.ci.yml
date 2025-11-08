@@ -1,4 +1,3 @@
-# .github/docker-compose.ci.yml
 services:
   db:
     image: postgres:16

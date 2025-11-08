@@ -1,32 +1,34 @@
-# .github/docker-compose.ci.yml
-services:
-  db:
-    image: postgres:16
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: calcdb
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d calcdb || exit 1"]
-      interval: 5s
-      timeout: 3s
-      retries: 10
+name: Docker Compose CI
 
-  api:
-    build:
-      context: ./app
-      dockerfile: Dockerfile
-    environment:
-      DATABASE_URL: postgresql+psycopg://postgres:postgres@db:5432/calcdb
-    depends_on:
-      db:
-        condition: service_healthy
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
-  pgadmin:
-    image: dpage/pgadmin4:8.13
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@example.com
-      PGADMIN_DEFAULT_PASSWORD: admin
-    depends_on:
-      db:
-        condition: service_healthy
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # Use only the CI compose (no host port bindings)
+      - name: Compose up (CI file only)
+        run: docker compose -f .github/docker-compose.ci.yml up -d --build --wait
+
+      - name: Show container status
+        run: docker compose -f .github/docker-compose.ci.yml ps
+
+      - name: Check Postgres ready
+        run: docker compose -f .github/docker-compose.ci.yml exec -T db pg_isready -U postgres -d calcdb
+
+      - name: Tail API logs
+        run: docker compose -f .github/docker-compose.ci.yml logs --tail=120 api
+
+      - name: Compose down
+        if: always()
+        run: docker compose -f .github/docker-compose.ci.yml down -v --remove-orphans
