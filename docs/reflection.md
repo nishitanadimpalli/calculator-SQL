@@ -1,0 +1,11 @@
+Reflection on Docker, PostgreSQL, and FastAPI Integration
+
+This project gave me valuable hands-on experience in integrating Docker, PostgreSQL, and FastAPI within a single development environment. Setting up the environment using Docker Compose made it easier to manage multiple services simultaneously, as each container handled a specific role—FastAPI for application logic, PostgreSQL for database management, and pgAdmin for database visualization. The process helped me understand how containerization simplifies deployment and eliminates dependency conflicts that usually occur in local setups.
+
+Working with PostgreSQL and pgAdmin allowed me to practice creating relational database schemas and establishing one-to-many relationships using foreign keys. I learned how to define tables for users and calculations, apply constraints to maintain data integrity, and execute fundamental SQL operations such as creating, inserting, querying, updating, and deleting records. Each step reinforced my understanding of how data flows between related tables and how queries can be optimized for meaningful insights.
+
+While performing the operations, I encountered some common issues, such as duplicate insertions and foreign key constraint errors. Debugging these helped me gain a deeper appreciation for relational data design and constraint management. I also explored the concept of cascading deletions and unique constraints, which ensured that the database remained consistent and clean even after modifications.
+
+In addition to SQL practice, configuring a GitHub Actions workflow for Docker Compose CI introduced me to continuous integration concepts. Automating the build and validation of containers through GitHub ensured that all components worked correctly in a controlled environment. This demonstrated how CI/CD pipelines play a vital role in maintaining code quality and reproducibility.
+
+Overall, this assignment strengthened my confidence in backend development and database integration. It taught me how to design, manage, and validate containerized systems while maintaining version control through GitHub. The experience improved my understanding of the connection between software, data, and infrastructure, which will be extremely valuable for future full-stack and data-driven projects.
